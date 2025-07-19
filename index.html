@@ -1,0 +1,1931 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comanda Boulevard</title>
+    <!-- Link para o Tailwind CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para aprimorar o Tailwind */
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f2f5; /* Fundo cinza claro */
+            color: #333; /* Cor do texto padrão */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        header {
+            background-color: #3498db; /* Cabeçalho azul */
+            color: #ffffff;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative; /* Para posicionar o botão de tema */
+        }
+        nav a {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem; /* Cantos arredondados para links de navegação */
+        }
+        nav a:hover {
+            background-color: #2980b9; /* Azul mais escuro no hover */
+            transform: translateY(-2px);
+        }
+        nav a.active-tab {
+            background-color: #2980b9; /* Cor da aba ativa */
+            pointer-events: none; /* Desabilita clique na aba ativa */
+        }
+        .section-content {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Cantos mais arredondados */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        h2, h3 {
+            color: #2c3e50; /* Cor de cabeçalho más escura */
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        form input, form select {
+            border: 1px solid #dcdcdc;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+        }
+        form input:focus, form select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        button {
+            background-color: #28a745; /* Botão verde */
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #218838; /* Verde más escuro no hover */
+            transform: translateY(-1px);
+        }
+        .table {
+            background-color: #2ecc71; /* Verde para mesas livres */
+            color: white;
+            text-align: center;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative; /* Necessário para posicionamento do botão de edição e remoção */
+        }
+        .table:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .table.occupied {
+            background-color: #e74c3c; /* Vermelho para mesas ocupadas */
+        }
+        .table.active {
+            border: 3px solid #f39c12; /* Borda laranja para mesa ativa */
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+        }
+        .product-item, .order-item, .sale-entry {
+            background-color: #f8f9fa; /* Fundo claro para itens da lista */
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column; /* Empilha itens verticalmente no mobile */
+            align-items: flex-start; /* Alinha itens ao início */
+            border: 1px solid #e9ecef;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        @media (min-width: 640px) {
+            .product-item, .order-item, .sale-entry {
+                flex-direction: row; /* Layout horizontal em telas maiores para simetria */
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        .product-item button, .order-item button {
+            background-color: #f39c12; /* Laranja para botões de ação */
+            border-radius: 0.375rem;
+            margin-top: 0.5rem; /* Adiciona margem para empilhar botões no mobile */
+        }
+        @media (min-width: 640px) {
+            .product-item button, .order-item button {
+                margin-top: 0; /* Remove a margem superior em telas maiores para alinhamento horizontal */
+            }
+        }
+        .order-item > span:first-child {
+            width: 100%; /* Garante que o nome ocupe a largura total no mobile */
+        }
+        .order-item > span:nth-child(2) {
+            width: 100%; /* Garante que o preço ocupe a largura total no mobile */
+            text-align: right;
+        }
+        @media (min-width: 640px) {
+            .order-item > span:first-child, .order-item > span:nth-child(2) {
+                width: auto; /* Largura automática em telas maiores */
+            }
+        }
+        .order-item .flex { /* Garante que os botões de ação permaneçam juntos */
+            width: 100%;
+            justify-content: flex-end; /* Alinha os botões à direita no mobile */
+            margin-top: 0.5rem;
+        }
+        @media (min-width: 640px) {
+             .order-item .flex {
+                width: auto;
+                margin-top: 0;
+            }
+        }
+
+        footer {
+            background-color: #2c3e50; /* Rodapé azul escuro */
+            color: #ffffff;
+            border-radius: 0 0 0.75rem 0.75rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none; /* Escondido por padrão */
+            text-align: center;
+            border: 1px solid #ccc;
+            width: 90%; /* Torna a caixa de mensagem responsiva */
+            max-width: 400px; /* Limita a largura máxima */
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .message-box button {
+            margin-top: 15px;
+            background-color: #3498db;
+        }
+        .message-box button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Estilos específicos do Modal */
+        .modal {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 1001; /* Más alto que la caja de mensaje */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); /* Preto com opacidade */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Adicionar Animação */
+        @-webkit-keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+
+        @keyframes animatetop {
+            from {top:-300px; opacity:0}
+            to {top:0; opacity:1}
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Destacar Valor Total */
+        .total-highlight {
+            background-color: #e6ffe6; /* Fundo verde claro */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: inline-block; /* Garante que o preenchimento e o fundo se apliquem corretamente */
+            transition: background-color 0.3s ease;
+        }
+        .order-product-result-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: default; /* Alterado para cursor padrão, pois o item em si não é clicável */
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-product-result-item:last-child {
+            border-bottom: none;
+        }
+        .order-product-result-item:hover {
+            background-color: #fff; /* Sem efeito de hover no próprio item */
+        }
+
+        .edit-table-btn {
+            position: absolute;
+            top: 5px;
+            right: 38px; /* Ajustado para dar espaço ao botão de remover */
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s ease, color 0.2s ease;
+            z-index: 10;
+        }
+        .edit-table-btn:hover {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .remove-table-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #e74c3c; /* Vermelho para o botão de remover */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s ease, color 0.2s ease;
+            z-index: 10;
+        }
+        .remove-table-btn:hover {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .csv-import-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #ecf0f1;
+        }
+        .add-product-list-btn {
+            background-color: #6a0dad; /* Uma cor mais distinta para o botão "Adicionar" na lista */
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background-color 0.2s ease;
+            margin-left: 0.5rem; /* Espaço entre o texto e o botão */
+        }
+        .add-product-list-btn:hover {
+            background-color: #4b0082; /* Roxo más escuro no hover */
+        }
+
+        /* Novo Modal de Confirmação */
+        .confirmation-modal {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 1002; /* Más alto que otros modales */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Fundo más escuro */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirmation-modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 25px;
+            border: 1px solid #888;
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+            text-align: center;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .confirmation-modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+
+        .confirmation-modal-content .flex button {
+            margin: 0 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+        }
+        .confirmation-modal-content .flex button.confirm-yes {
+            background-color: #e74c3c; /* Vermelho para Sim */
+        }
+        .confirmation-modal-content .flex button.confirm-yes:hover {
+            background-color: #c0392b;
+        }
+        .confirmation-modal-content .flex button.confirm-no {
+            background-color: #7f8c8d; /* Cinza para Não */
+        }
+        .confirmation-modal-content .flex button.confirm-no:hover {
+            background-color: #5d6d7e;
+        }
+        /* Estilos para esconder/mostrar métodos de pagamento */
+        .other-payment-methods-section {
+            display: none; /* Escondido por padrão */
+        }
+        .active-payment-method-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .active-payment-method-item:last-child {
+            margin-bottom: 0;
+        }
+        .active-payment-method-item input {
+            margin-left: 1rem;
+        }
+        .remove-payment-method-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-left: 0.5rem;
+        }
+        .remove-payment-method-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Novas classes para os ícones de pagamento com cores e hover */
+        .payment-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .payment-icon-wrapper:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Cores específicas para cada ícone */
+        .payment-icon-wrapper[data-method="cash"] svg { color: #28a745; } /* Verde para Dinheiro */
+        .payment-icon-wrapper[data-method="pix"] svg { color: #00b894; } /* Verde-água para Pix */
+        .payment-icon-wrapper[data-method="credit"] svg { color: #e74c3c; } /* Vermelho para Crédito */
+        .payment-icon-wrapper[data-method="debit"] svg { color: #3498db; } /* Azul para Débito */
+
+        /* Cores do texto dos ícones */
+        .payment-icon-wrapper[data-method="cash"] span { color: #28a745; }
+        .payment-icon-wrapper[data-method="pix"] span { color: #00b894; }
+        .payment-icon-wrapper[data-method="credit"] span { color: #e74c3c; }
+        .payment-icon-wrapper[data-method="debit"] span { color: #3498db; }
+
+        /* Estilos para o input de valor de pagamento realçado */
+        .payment-amount-input {
+            background-color: #e0f7fa; /* Fundo azul claro */
+            border: 2px solid #00bcd4; /* Borda ciano */
+            font-weight: bold;
+            color: #00796b; /* Texto verde escuro */
+            transition: all 0.2s ease-in-out;
+        }
+        .payment-amount-input:focus {
+            background-color: #b2ebf2; /* Fundo más escuro no foco */
+            border-color: #0097a7; /* Borda más escura no foco */
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.3); /* Sombra más forte no foco */
+        }
+
+        /* --- Estilos para o Modo Escuro --- */
+        body.dark-mode {
+            background-color: #1a202c; /* Fundo escuro */
+            color: #e2e8f0; /* Texto claro */
+        }
+        body.dark-mode header {
+            background-color: #2d3748; /* Cabeçalho más escuro */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode nav a {
+            color: #e2e8f0;
+        }
+        body.dark-mode nav a:hover {
+            background-color: #4a5568; /* Azul más escuro no hover */
+        }
+        body.dark-mode nav a.active-tab {
+            background-color: #4a5568;
+        }
+        body.dark-mode .section-content {
+            background-color: #2d3748; /* Fundo de seção escuro */
+            border-color: #4a5568;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode h2, body.dark-mode h3 {
+            color: #e2e8f0; /* Títulos claros */
+            border-color: #4a5568;
+        }
+        body.dark-mode form label { /* Adicionado para garantir que os labels mudem de cor */
+            color: #e2e8f0;
+        }
+        body.dark-mode form input, body.dark-mode form select {
+            background-color: #4a5568;
+            border-color: #636b6f;
+            color: #e2e8f0;
+        }
+        body.dark-mode form input::placeholder {
+            color: #a0aec0; /* Placeholder más claro */
+        }
+        body.dark-mode .table {
+            background-color: #38a169; /* Verde más escuro para mesas livres */
+        }
+        body.dark-mode .table.occupied {
+            background-color: #c53030; /* Vermelho más escuro para mesas ocupadas */
+        }
+        body.dark-mode .table.active {
+            border-color: #dd6b20; /* Laranja más escuro para mesa ativa */
+        }
+        body.dark-mode .product-item, body.dark-mode .order-item, body.dark-mode .sale-entry {
+            background-color: #4a5568; /* Fundo de item escuro */
+            border-color: #636b6f;
+            color: #e2e8f0;
+        }
+        body.dark-mode .product-item span, body.dark-mode .order-item span {
+            color: #e2e8f0; /* Texto de item claro */
+        }
+        body.dark-mode .order-item .font-bold.text-gray-800 {
+            color: #e2e8f0; /* Preço do item claro */
+        }
+        body.dark-mode .total-highlight {
+            background-color: #1c4532; /* Fundo verde escuro para total */
+            color: #9ae6b4; /* Texto verde claro para total */
+        }
+        body.dark-mode .message-box {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark-mode .message-box button {
+            background-color: #3498db;
+        }
+        body.dark-mode .modal-content {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark-mode .modal-content label {
+            color: #e2e8f0;
+        }
+        body.dark-mode .confirmation-modal-content {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.dark-mode .confirmation-modal-content p {
+            color: #e2e8f0;
+        }
+        body.dark-mode footer {
+            background-color: #1a202c;
+            color: #a0aec0;
+        }
+        body.dark-mode .active-payment-method-item {
+            background-color: #4a5568;
+            border-color: #636b6f;
+            color: #e2e8f0;
+        }
+        body.dark-mode .payment-amount-input {
+            background-color: #2d3748;
+            border-color: #00796b;
+            color: #e0f7fa;
+        }
+        body.dark-mode .payment-amount-input:focus {
+            background-color: #1c4532;
+            border-color: #00564d;
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.3);
+        }
+        /* Novas regras para a lista de resultados da busca de produtos */
+        body.dark-mode #order-product-results {
+            background-color: #2d3748; /* Fundo escuro para a lista de resultados */
+            border-color: #4a5568; /* Borda más escura */
+        }
+        body.dark-mode .order-product-result-item {
+            color: #e2e8f0; /* Texto claro para os itens */
+            border-color: #4a5568; /* Borda más escura entre os itens */
+        }
+        body.dark-mode .order-product-result-item span {
+            color: #e2e8f0; /* Garante que o span interno também seja claro */
+        }
+        body.dark-mode .order-product-result-item:hover {
+            background-color: #4a5568; /* Fundo de hover más escuro */
+        }
+
+        /* Estilos para o texto "Comanda da Mesa" e número da mesa no modo escuro */
+        body.dark-mode #current-order h3 {
+            color: #9ae6b4; /* Um verde claro para o título no modo escuro */
+        }
+        body.dark-mode #current-order #current-table-number {
+            color: #63b3ed; /* Um azul más claro para o número da mesa no modo escuro */
+        }
+
+        /* Estilos para o relatório de vendas no modo escuro */
+        body.dark-mode .sale-entry {
+            background-color: #4a5568; /* Fundo más escuro para cada entrada de venda */
+            border-color: #636b6f;
+        }
+        body.dark-mode .sale-entry h4 {
+            color: #e2e8f0; /* Título da venda claro */
+        }
+        body.dark-mode .sale-entry h4 span {
+            color: #a0aec0; /* Data/hora da venda más clara */
+        }
+        body.dark-mode .sale-entry ul li {
+            color: #e2e8f0; /* Itens da lista de vendas claros */
+        }
+        body.dark-mode .sale-entry p {
+            color: #e2e8f0; /* Parágrafos (total, pagamentos, troco) claros */
+        }
+        body.dark-mode .sale-entry .text-green-700 { /* Total da Venda */
+            color: #9ae6b4; /* Verde claro para o total da venda */
+        }
+        body.dark-mode .sales-report-content p.text-gray-500 { /* "Nenhuma venda registrada ainda." */
+            color: #a0aec0; /* Cinza más claro para mensagens de vazio */
+        }
+        body.dark-mode .sales-report-content h3.text-blue-800 { /* Total Geral de Vendas */
+            color: #63b3ed; /* Azul claro para o total geral */
+        }
+        /* Estilos para a mensagem de comanda vazia no modo escuro */
+        body.dark-mode #empty-order-message {
+            color: #a0aec0; /* Cor más clara para a mensagem de comanda vazia */
+        }
+        /* Estilos para o input de seleção de codificação no modo escuro */
+        body.dark-mode #csv-encoding-select {
+            background-color: #4a5568;
+            border-color: #636b6f;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Seção do Cabeçalho -->
+    <header class="text-center">
+        <h1 class="text-3xl sm:text-4xl font-extrabold mb-4">Comanda Boulevard</h1>
+        <nav>
+            <ul class="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-6 px-4">
+                <li><a href="#comanda" class="nav-link block px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-opacity-80 transition-all duration-200">Fazer Comanda</a></li>
+                <li><a href="#cadastro" class="nav-link block px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-opacity-80 transition-all duration-200">Cadastro de Produtos</a></li>
+                <li><a href="#relatorio" class="nav-link block px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-opacity-80 transition-all duration-200">Relatório de Vendas</a></li>
+            </ul>
+        </nav>
+        <!-- Botão de alternar tema -->
+        <button id="theme-toggle" class="absolute top-4 right-4 bg-gray-700 text-white p-2 rounded-full shadow-lg hover:bg-gray-600 transition-colors duration-300">
+            ☀️
+        </button>
+    </header>
+
+    <!-- Área de Conteúdo Principal -->
+    <main class="flex-grow p-4 sm:p-5 max-w-4xl mx-auto w-full">
+        <!-- Caixa de Mensagens para alertas -->
+        <div id="messageBox" class="message-box">
+            <p id="messageText"></p>
+            <button onclick="hideMessageBox()">OK</button>
+        </div>
+
+        <!-- Seção de Gerenciamento de Comandas (Visualização Padrão) -->
+        <section id="comanda" class="section-content content-section p-4 sm:p-6 md:p-8">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">Fazer Comanda</h2>
+            <div class="tables-container grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5">
+                <!-- As mesas serão geradas e gerenciadas aqui via JavaScript -->
+            </div>
+            <div class="flex justify-center mt-6">
+                <button id="add-new-table-btn" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 text-sm sm:text-base">Adicionar Mesa</button>
+            </div>
+
+
+            <div id="current-order" class="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-md mt-8">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-blue-600">Comanda da Mesa <span id="current-table-number" class="font-extrabold text-2xl sm:text-3xl text-blue-800">Nenhuma</span></h3>
+
+                <div class="mb-4 relative"> <!-- Added relative for absolute positioning of results -->
+                    <label for="order-product-search" class="block text-gray-700 text-sm font-bold mb-2">Adicionar Produto (digite ou selecione):</label>
+                    <input type="text" id="order-product-search" placeholder="Buscar produto..." class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                    <ul id="order-product-results" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-48 overflow-y-auto shadow-lg hidden">
+                        <!-- Os resultados da busca ou a lista completa serão preenchidos aqui -->
+                    </ul>
+                </div>
+
+                <ul id="order-items" class="space-y-3 mb-6">
+                    <!-- Os itens da comanda serão adicionados aqui via JavaScript -->
+                    <p id="empty-order-message" class="text-gray-500 italic">Nenhum item nesta comanda.</p>
+                </ul>
+
+                <p class="text-lg sm:text-xl font-bold text-gray-800 flex justify-between items-center">
+                    Total: <span id="order-total" class="text-green-600 text-2xl sm:text-3xl font-extrabold total-highlight">0.00</span>
+                </p>
+
+                <!-- Seção de Métodos de Pagamento -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h4 class="text-lg font-semibold mb-3 text-gray-800">Métodos de Pagamento:</h4>
+                    <div id="active-payment-methods-list" class="space-y-3">
+                        <!-- Métodos de pagamento ativos serão renderizados aqui dinamicamente -->
+                        <p id="no-payment-methods-added" class="text-gray-500 italic">Nenhum método de pagamento adicionado.</p>
+                    </div>
+
+                    <div id="available-payment-methods-section" class="mt-4 pt-4 border-t border-gray-200">
+                        <h5 class="text-md font-semibold mb-2 text-gray-700">Adicionar método:</h5>
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            <!-- Ícones clicáveis para métodos disponíveis -->
+                            <div class="payment-icon-wrapper" data-method="cash" id="add-cash-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet">
+                                    <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 0 0 4h12c.77 0 1.5.38 2 1v2"/><path d="M7 12h3"/></svg>
+                                <span class="text-sm">Dinheiro</span>
+                            </div>
+                            <div class="payment-icon-wrapper" data-method="pix" id="add-pix-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code">
+                                    <rect width="8" height="8" x="2" y="2" rx="1"/><rect width="8" height="8" x="14" y="2" rx="1"/><rect width="8" height="8" x="2" y="14" rx="1"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/><path d="M12 12h.01"/><path d="M12 7h.01"/><path d="M12 17h.01"/><path d="M7 12h.01"/><path d="M17 12h.01"/></svg>
+                                <span class="text-sm">Pix</span>
+                            </div>
+                            <div class="payment-icon-wrapper" data-method="credit" id="add-credit-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card">
+                                    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                <span class="text-sm">Crédito</span>
+                            </div>
+                            <div class="payment-icon-wrapper" data-method="debit" id="add-debit-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card">
+                                    <rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                <span class="text-sm">Débito</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-lg sm:text-xl font-bold text-gray-800 flex justify-between items-center mt-4">
+                        Total Pago: <span id="total-paid-display" class="text-purple-600 text-xl font-extrabold">0.00</span>
+                    </p>
+                    <p class="text-lg sm:text-xl font-bold text-gray-800 flex justify-between items-center mt-2">
+                        Troco: <span id="change-display" class="text-blue-600 text-xl font-extrabold">0.00</span>
+                    </p>
+                </div>
+                <!-- Fim da Seção de Métodos de Pagamento -->
+
+                <div class="flex justify-end mt-6">
+                    <button id="close-order" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 text-sm sm:text-base">Fechar Comanda</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Cadastro de Produtos -->
+        <section id="cadastro" class="section-content content-section hidden p-4 sm:p-6 md:p-8">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">Cadastro de Produtos</h2>
+            <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                    <label for="product-name" class="block text-gray-700 text-sm font-bold mb-2">Nome do Produto:</label>
+                    <input type="text" id="product-name" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                </div>
+                <div>
+                    <label for="product-price" class="block text-gray-700 text-sm font-bold mb-2">Preço (R$):</label>
+                    <input type="number" id="product-price" step="0.01" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                </div>
+                <button type="submit" class="md:col-span-2 bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 text-sm sm:text-base">Cadastrar Produto</button>
+            </form>
+
+            <h3 class="text-lg sm:text-xl md:text-2xl font-semibold mt-8 mb-4">Produtos Cadastrados</h3>
+            <div class="mb-4">
+                <label for="product-search" class="block text-gray-700 text-sm font-bold mb-2">Pesquisar Produto:</label>
+                <input type="text" id="product-search" placeholder="Digite para pesquisar produtos..." class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+            </div>
+            <ul id="product-list" class="space-y-3">
+                <!-- Os produtos serão listados aqui via JavaScript -->
+            </ul>
+
+            <div class="csv-import-section">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-semibold mb-4">Importar Produtos (CSV)</h3>
+                <p class="text-gray-600 text-sm mb-4">
+                    Selecione um arquivo CSV com o formato: `Nome do Produto,Preço`. <br>
+                    Exemplo: `Refrigerante,5.50`<br>
+                    Cada produto em uma nova linha.
+                </p>
+                <div class="flex flex-col sm:flex-row items-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    <input type="file" id="csv-file-input" accept=".csv" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                    <div class="flex flex-col w-full sm:w-auto">
+                        <label for="csv-encoding-select" class="block text-gray-700 text-sm font-bold mb-2">Codificação do CSV:</label>
+                        <select id="csv-encoding-select" class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                            <option value="UTF-8">UTF-8</option>
+                            <option value="ISO-8859-1">ISO-8859-1 (Latin-1)</option>
+                        </select>
+                    </div>
+                    <button id="import-csv-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 w-full sm:w-auto text-sm sm:text-base">Importar do CSV</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Relatório de Vendas -->
+        <section id="relatorio" class="section-content content-section hidden p-4 sm:p-6 md:p-8">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">Relatório de Vendas</h2>
+            <div id="sales-report-content" class="overflow-x-auto">
+                <!-- O relatório de vendas será gerado aqui via JavaScript -->
+                <p class="text-gray-500 italic">Nenhuma venda registrada ainda.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Edição de Produto -->
+    <div id="editProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="hideEditProductModal()">&times;</span>
+            <h3 class="text-lg sm:text-xl md:text-2xl font-semibold mb-4">Editar Produto</h3>
+            <form id="edit-product-form" class="grid grid-cols-1 gap-4">
+                <input type="hidden" id="edit-product-id">
+                <div>
+                    <label for="edit-product-name" class="block text-gray-700 text-sm font-bold mb-2">Nome do Produto:</label>
+                    <input type="text" id="edit-product-name" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                </div>
+                <div>
+                    <label for="edit-product-price" class="block text-gray-700 text-sm font-bold mb-2">Preço (R$):</label>
+                    <input type="number" id="edit-product-price" step="0.01" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                </div>
+                <div class="flex justify-end space-x-2 mt-4">
+                    <button type="button" onclick="hideEditProductModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg transition duration-300 text-sm sm:text-base">Cancelar</button>
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg transition duration-300 text-sm sm:text-base">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição de Nome da Mesa -->
+    <div id="editTableNameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="hideEditTableNameModal()">&times;</span>
+            <h3 class="text-lg sm:text-xl md:text-2xl font-semibold mb-4">Editar Nome da Mesa</h3>
+            <form id="edit-table-name-form" class="grid grid-cols-1 gap-4">
+                <input type="hidden" id="edit-table-id">
+                <div>
+                    <label for="new-table-name" class="block text-gray-700 text-sm font-bold mb-2">Novo Nome da Mesa:</label>
+                    <input type="text" id="new-table-name" required class="shadow appearance-none border rounded-lg w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base">
+                </div>
+                <div class="flex justify-end space-x-2 mt-4">
+                    <button type="button" onclick="hideEditTableNameModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg transition duration-300 text-sm sm:text-base">Cancelar</button>
+                    <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg transition duration-300 text-sm sm:text-base">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Novo Modal de Confirmação -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-modal-content">
+            <p id="confirmationText"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirmYesBtn" class="confirm-yes">Sim</button>
+                <button id="confirmNoBtn" class="confirm-no">Não</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Seção do Rodapé -->
+    <footer class="text-center p-5 mt-auto">
+        <p class="text-xs sm:text-sm">&copy; 2025 Comanda Boulevard. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // --- Funções Auxiliares Globais ---
+        // Estas funções são definidas globalmente para serem acessíveis pelos atributos onclick no HTML
+        function hideMessageBox() {
+            document.getElementById('messageBox').style.display = 'none';
+        }
+
+        function hideEditProductModal() {
+            document.getElementById('editProductModal').style.display = 'none';
+        }
+
+        function hideEditTableNameModal() {
+            document.getElementById('editTableNameModal').style.display = 'none';
+        }
+
+        // Lógica JavaScript para o Comanda Boulevard
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elementos DOM ---
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmationText = document.getElementById('confirmationText');
+            const confirmYesBtn = document.getElementById('confirmYesBtn');
+            const confirmNoBtn = document.getElementById('confirmNoBtn');
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            const productForm = document.getElementById('product-form');
+            const productList = document.getElementById('product-list');
+            const productSearchInput = document.getElementById('product-search');
+
+            const editProductModal = document.getElementById('editProductModal');
+            const editProductForm = document.getElementById('edit-product-form');
+            const editProductIdInput = document.getElementById('edit-product-id');
+            const editProductNameInput = document.getElementById('edit-product-name');
+            const editProductPriceInput = document.getElementById('edit-product-price');
+
+            const tablesContainer = document.querySelector('.tables-container');
+            const currentTableNumberSpan = document.getElementById('current-table-number');
+            const orderItemsList = document.getElementById('order-items');
+            const orderTotalSpan = document.getElementById('order-total');
+            const closeOrderButton = document.getElementById('close-order');
+            const emptyOrderMessage = document.getElementById('empty-order-message');
+
+            const orderProductSearchInput = document.getElementById('order-product-search');
+            const orderProductResultsList = document.getElementById('order-product-results');
+
+            const editTableNameModal = document.getElementById('editTableNameModal');
+            const editTableNameForm = document.getElementById('edit-table-name-form');
+            const editTableIdInput = document.getElementById('edit-table-id');
+            const newTableNameInput = document.getElementById('new-table-name');
+
+            const csvFileInput = document.getElementById('csv-file-input');
+            const csvEncodingSelect = document.getElementById('csv-encoding-select'); // Novo elemento
+            const importCsvBtn = document.getElementById('import-csv-btn');
+
+            const addNewTableBtn = document.getElementById('add-new-table-btn');
+
+            const activePaymentMethodsList = document.getElementById('active-payment-methods-list');
+            const availablePaymentMethodsSection = document.getElementById('available-payment-methods-section');
+            const noPaymentMethodsAddedMessage = document.getElementById('no-payment-methods-added');
+
+            const totalPaidDisplay = document.getElementById('total-paid-display');
+            const changeDisplay = document.getElementById('change-display');
+
+            const themeToggleBtn = document.getElementById('theme-toggle'); // Novo elemento
+
+            // Map para armazenar os métodos de pagamento ativos e seus valores
+            const activePayments = {
+                cash: { name: 'Dinheiro', amount: 0, icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 0 0 4h12c.77 0 1.5.38 2 1v2"/><path d="M7 12h3"/></svg>` },
+                pix: { name: 'Pix', amount: 0, icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code"><rect width="8" height="8" x="2" y="2" rx="1"/><rect width="8" height="8" x="14" y="2" rx="1"/><rect width="8" height="8" x="2" y="14" rx="1"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/><path d="M12 12h.01"/><path d="M12 7h.01"/><path d="M12 17h.01"/><path d="M7 12h.01"/><path d="M17 12h.01"/></svg>` },
+                credit: { name: 'Crédito', amount: 0, icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>` },
+                debit: { name: 'Débito', amount: 0, icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>` }
+            };
+            // Para controlar quais métodos estão sendo usados na comanda atual
+            let currentActivePaymentMethods = {};
+
+
+            // --- Funções Auxiliares (locais ao DOMContentLoaded) ---
+            /**
+             * Exibe uma mensagem na caixa de mensagens do aplicativo.
+             * @param {string} message - A mensagem a ser exibida.
+             */
+            function showMessage(message) {
+                messageText.textContent = message;
+                messageBox.style.display = 'block';
+            }
+
+            let onConfirmCallback = null;
+
+            /**
+             * Exibe um modal de confirmação com uma mensagem e um callback.
+             * @param {string} message - A mensagem de confirmação.
+             * @param {function(boolean): void} callback - A função a ser chamada com `true` se confirmado, `false` se cancelado.
+             */
+            function showConfirmationModal(message, callback) {
+                confirmationModal.style.display = 'flex'; // Usar flex para centralizar
+                confirmationText.textContent = message;
+                onConfirmCallback = callback; // Armazena o callback
+            }
+
+            // Listeners para os botões do modal de confirmação
+            confirmYesBtn.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+                if (onConfirmCallback) {
+                    onConfirmCallback(true); // Chama o callback com true para confirmar
+                }
+            });
+
+            confirmNoBtn.addEventListener('click', () => {
+                confirmationModal.style.display = 'none';
+                if (onConfirmCallback) {
+                    onConfirmCallback(false); // Chama o callback com false para cancelar
+                }
+            });
+
+
+            // --- Lógica de Navegação por Abas ---
+            let products = JSON.parse(localStorage.getItem('comandaProducts')) || [];
+            let customTableNames = JSON.parse(localStorage.getItem('comandaCustomTableNames')) || {};
+            let tableOrders = JSON.parse(localStorage.getItem('comandaTableOrders')) || {};
+            let activeTableId = null; // ID da mesa atualmente selecionada
+
+            const INITIAL_TABLES_COUNT = 5; // Número inicial de mesas
+
+            // Lógica para inicializar ou carregar a contagem total de mesas
+            // totalTablesCount agora representa o MAIOR ID de mesa já usado/existente
+            let totalTablesCount = parseInt(localStorage.getItem('totalTablesCount')) || INITIAL_TABLES_COUNT;
+
+            /**
+             * Inicializa os dados das mesas, garantindo que as mesas iniciais existam
+             * e que os dados de nomes personalizados e pedidos estejam consistentes.
+             */
+            function initializeTablesData() {
+                let changed = false;
+                // Certifica-se de que customTableNames e tableOrders tenham entradas para as mesas existentes
+                for (let i = 1; i <= totalTablesCount; i++) {
+                    const tableId = `table-${i}`;
+                    // Só adiciona se não existir, para não sobrescrever nomes personalizados ou estados de comanda
+                    if (!customTableNames[tableId]) {
+                        customTableNames[tableId] = `Mesa ${i}`;
+                        changed = true;
+                    }
+                    if (!tableOrders[tableId]) {
+                        tableOrders[tableId] = { items: [], occupied: false };
+                    }
+                }
+                // Remove quaisquer mesas que possam ter IDs maiores do que totalTablesCount, se o usuário diminuiu
+                // Isso é para o caso de um usuário manualmente diminuir totalTablesCount no localStorage.
+                // Na operação normal, totalTablesCount só aumenta.
+                for (const tableId in customTableNames) {
+                    const num = parseInt(tableId.replace('table-', ''));
+                    if (num > totalTablesCount) {
+                        delete customTableNames[tableId];
+                        delete tableOrders[tableId]; // Remove também os pedidos associados
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    localStorage.setItem('comandaCustomTableNames', JSON.stringify(customTableNames));
+                    localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                    localStorage.setItem('totalTablesCount', totalTablesCount.toString());
+                }
+            }
+
+
+            /**
+             * Exibe a seção do aplicativo correspondente ao ID fornecido e atualiza a navegação.
+             * @param {string} sectionId - O ID da seção a ser exibida (ex: 'comanda', 'cadastro', 'relatorio').
+             */
+            function showSection(sectionId) {
+                // Esconde todas as seções
+                contentSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                // Mostra a seção alvo
+                document.getElementById(sectionId).classList.remove('hidden');
+
+                // Atualiza o estilo da aba ativa
+                navLinks.forEach(link => {
+                    link.classList.remove('active-tab');
+                });
+                document.querySelector(`nav a[href="#${sectionId}"]`).classList.add('active-tab');
+
+                 // Re-renderiza dados relevantes ao trocar de aba
+                if (sectionId === 'cadastro') {
+                    renderProducts();
+                    productSearchInput.value = ''; // Limpa a busca ao navegar para a aba de produtos
+                } else if (sectionId === 'relatorio') {
+                    renderSalesReport();
+                } else if (sectionId === 'comanda') {
+                    renderTables(); // Garante que as mesas sejam renderizadas/re-renderizadas
+                    orderProductSearchInput.value = ''; // Limpa a busca de produtos da comanda
+                    orderProductResultsList.classList.add('hidden'); // Esconde os resultados da busca
+                    resetPaymentInputs(); // Reseta os campos de pagamento ao mudar para a aba de comanda
+                }
+            }
+
+            // Adiciona listeners de clique aos links de navegação
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); // Previne o comportamento padrão do link de âncora
+                    const sectionId = e.target.getAttribute('href').substring(1); // Obtém o ID sem '#'
+                    showSection(sectionId);
+                });
+            });
+
+            // Mostra a seção 'Comanda' por padrão ao carregar a página
+            initializeTablesData(); // Garante que os dados das mesas estão prontos antes de renderizar
+            showSection('comanda');
+
+
+            /**
+             * Renderiza a lista de produtos na seção de cadastro.
+             * @param {Array<Object>} [displayProducts=products] - Array de produtos a serem exibidos (opcional, padrão para todos os produtos).
+             */
+            function renderProducts(displayProducts = products) {
+                productList.innerHTML = '';
+
+                if (displayProducts.length === 0 && productSearchInput.value === '') {
+                    productList.innerHTML = '<p class="text-gray-500 italic">Nenhum produto cadastrado.</p>';
+                } else if (displayProducts.length === 0 && productSearchInput.value !== '') {
+                     productList.innerHTML = '<p class="text-gray-500 italic">Nenhum produto encontrado com este termo.</p>';
+                }
+
+                displayProducts.forEach((product) => { // Renderiza produtos filtrados na lista
+                    const li = document.createElement('li');
+                    li.className = 'product-item p-3 mb-2 sm:p-4 sm:mb-3 text-sm sm:text-base';
+                    li.innerHTML = `
+                            <span class="font-medium">${product.name}</span>
+                            <span class="font-semibold text-gray-700">R$ ${product.price.toFixed(2)}</span>
+                            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-2 sm:mt-0">
+                                <button data-id="${product.id}" class="edit-product-btn bg-blue-500 hover:bg-blue-700 px-3 py-1.5 sm:px-4 sm:py-2">Editar</button>
+                                <button data-id="${product.id}" class="remove-product-btn bg-red-500 hover:bg-red-700 px-3 py-1.5 sm:px-4 sm:py-2">Remover</button>
+                            </div>
+                        `;
+                    productList.appendChild(li);
+                });
+
+                // Adiciona listeners de evento para botões de edição e remoção
+                document.querySelectorAll('.edit-product-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = e.target.dataset.id;
+                        editProduct(productId);
+                    });
+                });
+
+                document.querySelectorAll('.remove-product-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = e.target.dataset.id;
+                        removeProduct(productId);
+                    });
+                });
+            }
+
+            /**
+             * Remove um produto da lista de produtos.
+             * @param {string} productId - O ID do produto a ser removido.
+             */
+            function removeProduct(productId) {
+                const indexToRemove = products.findIndex(p => p.id === productId);
+                if (indexToRemove !== -1) {
+                    products.splice(indexToRemove, 1);
+                    localStorage.setItem('comandaProducts', JSON.stringify(products));
+                    renderProducts(); // Re-renderiza todos os produtos após a remoção
+                    productSearchInput.value = ''; // Limpa a busca
+                    showMessage('Produto removido!');
+                }
+            }
+
+
+            /**
+             * Preenche o modal de edição de produto com os dados do produto selecionado.
+             * @param {string} productId - O ID do produto a ser editado.
+             */
+            function editProduct(productId) {
+                const productToEdit = products.find(p => p.id === productId);
+                if (productToEdit) {
+                    editProductIdInput.value = productToEdit.id;
+                    editProductNameInput.value = productToEdit.name;
+                    editProductPriceInput.value = productToEdit.price;
+                    editProductModal.style.display = 'flex'; // Usa flex para centralizar o modal
+                }
+            }
+
+            // Lida com o envio do formulário de produto (para adicionar novo produto)
+            productForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const productName = document.getElementById('product-name').value.trim();
+                const productPrice = parseFloat(document.getElementById('product-price').value);
+
+                if (productName && !isNaN(productPrice) && productPrice > 0) {
+                    const newProduct = {
+                        id: Date.now().toString(), // ID único para o produto
+                        name: productName.normalize('NFC'), // Normaliza o nome ao cadastrar
+                        price: productPrice
+                    };
+                    products.push(newProduct);
+                    localStorage.setItem('comandaProducts', JSON.stringify(products));
+                    renderProducts();
+                    productForm.reset();
+                    productSearchInput.value = ''; // Limpa a busca
+                    showMessage('Produto cadastrado com sucesso!');
+                } else {
+                    showMessage('Por favor, preencha o nome do produto e um preço válido (maior que zero).');
+                }
+            });
+
+            // Lida com o envio do formulário de edição de produto
+            editProductForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const productId = editProductIdInput.value;
+                const newName = editProductNameInput.value.trim();
+                const newPrice = parseFloat(editProductPriceInput.value);
+
+                if (newName && !isNaN(newPrice) && newPrice > 0) {
+                    const productIndex = products.findIndex(p => p.id === productId);
+                    if (productIndex !== -1) {
+                        products[productIndex].name = newName.normalize('NFC'); // Normaliza o nome ao editar
+                        products[productIndex].price = newPrice;
+                        localStorage.setItem('comandaProducts', JSON.stringify(products));
+                        renderProducts(); // Re-renderiza todos os produtos
+                        editProductModal.style.display = 'none'; // Esconde o modal
+                        showMessage('Produto atualizado com sucesso!');
+                    }
+                } else {
+                    showMessage('Por favor, preencha o nome do produto e um preço válido (maior que zero) para a edição.');
+                }
+            });
+
+            // Listener de evento para o input de busca de produtos
+            productSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().normalize('NFC'); // Normaliza o termo de busca
+                const filteredProducts = products.filter(product =>
+                    product.name.toLowerCase().normalize('NFC').includes(searchTerm) // Normaliza o nome do produto para comparação
+                );
+                renderProducts(filteredProducts); // Renderiza apenas produtos filtrados
+            });
+
+            // --- Gerenciamento de Mesas e Comandas ---
+            /**
+             * Renderiza os elementos das mesas no contêiner de mesas e define o estado inicial.
+             */
+            function renderTables() {
+                tablesContainer.innerHTML = ''; // Limpa as mesas existentes
+                // Itera até o maior ID de mesa registrado
+                for (let i = 1; i <= totalTablesCount; i++) {
+                    const tableId = `table-${i}`;
+                    // Renderiza a mesa apenas se ela existir nos dados (não foi removida)
+                    if (customTableNames[tableId]) {
+                        const tableName = customTableNames[tableId];
+                        const tableDiv = document.createElement('div');
+                        tableDiv.id = tableId;
+                        tableDiv.className = `table cursor-pointer p-3 sm:p-4 md:p-5 rounded-lg shadow-md hover:scale-105 transition-transform duration-200 text-base sm:text-lg ${tableOrders[tableId] && tableOrders[tableId].occupied ? 'occupied' : ''}`;
+                        tableDiv.innerHTML = `
+                            <span>${tableName}</span>
+                            <button class="edit-table-btn" data-table-id="${tableId}" title="Editar Nome da Mesa">
+                                ✎
+                            </button>
+                            <button class="remove-table-btn" data-table-id="${tableId}" title="Remover Mesa">
+                                X
+                            </button>
+                        `;
+                        tableDiv.dataset.tableNumber = i; // Armazena o número da mesa
+
+                        // Adiciona o listener de dblclick a cada mesa (para selecionar)
+                        tableDiv.addEventListener('dblclick', (e) => {
+                            // Garante que o dblclick nos botões não ative a seleção da mesa
+                            if (!e.target.classList.contains('edit-table-btn') && !e.target.classList.contains('remove-table-btn')) {
+                                selectNewTable(tableId);
+                            }
+                        });
+
+                        // Adiciona o listener de click para o botão de edição
+                        const editButton = tableDiv.querySelector('.edit-table-btn');
+                        if (editButton) {
+                            editButton.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const tableToEditId = e.target.dataset.tableId;
+                                openEditTableNameModal(tableToEditId);
+                            });
+                        }
+
+                        // Adiciona o listener de click para o botão de remoção
+                        const removeButton = tableDiv.querySelector('.remove-table-btn');
+                        if (removeButton) {
+                            removeButton.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const tableToRemoveId = e.target.dataset.tableId;
+                                showConfirmationModal(`Tem certeza que deseja remover a ${customTableNames[tableToRemoveId]}? Todos os dados da comanda serão perdidos.`, (confirmed) => {
+                                    if (confirmed) {
+                                        removeTable(tableToRemoveId);
+                                    }
+                                });
+                            });
+                        }
+
+                        tablesContainer.appendChild(tableDiv);
+                    }
+                }
+                // Salva o estado atual das mesas após a renderização para garantir consistência
+                localStorage.setItem('comandaCustomTableNames', JSON.stringify(customTableNames));
+                localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                localStorage.setItem('totalTablesCount', totalTablesCount.toString());
+            }
+
+            /**
+             * Remove uma mesa do sistema.
+             * @param {string} tableId - O ID da mesa a ser removida.
+             */
+            function removeTable(tableId) {
+                // Remove a mesa dos dados
+                delete customTableNames[tableId];
+                delete tableOrders[tableId];
+
+                // Se a mesa removida for a mesa ativa, desativa-a
+                if (activeTableId === tableId) {
+                    activeTableId = null;
+                    currentTableNumberSpan.textContent = 'Nenhuma';
+                    renderCurrentOrder(); // Limpa a exibição da comanda
+                }
+
+                // Salva as alterações no localStorage
+                localStorage.setItem('comandaCustomTableNames', JSON.stringify(customTableNames));
+                localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                // totalTablesCount não é decrementado, pois representa o maior ID já usado.
+                // Isso evita reindexação complexa e mantém IDs únicos.
+
+                renderTables(); // Re-renderiza as mesas para refletir a remoção
+                showMessage(`Mesa ${tableId.replace('table-', '')} removida com sucesso!`);
+            }
+
+
+            /**
+             * Seleciona uma nova mesa, atualiza a UI e carrega/cria a comanda para ela.
+             * @param {string} tableId - O ID da mesa a ser selecionada.
+             */
+            function selectNewTable(tableId) {
+                // Desseleciona a mesa anterior, se houver
+                if (activeTableId) {
+                    const prevTableElement = document.getElementById(activeTableId);
+                    if (prevTableElement) {
+                        prevTableElement.classList.remove('active');
+                    }
+                }
+
+                // Define a nova mesa ativa
+                activeTableId = tableId;
+                const currentTableElement = document.getElementById(activeTableId);
+                if (currentTableElement) {
+                    currentTableElement.classList.add('active');
+                }
+
+                currentTableNumberSpan.textContent = customTableNames[activeTableId] || (currentTableElement ? currentTableElement.querySelector('span').textContent : 'Nenhuma');
+
+                // Inicializa a comanda para a mesa se ela não existir
+                if (!tableOrders[activeTableId]) {
+                    tableOrders[activeTableId] = { items: [], occupied: false };
+                }
+
+                // Marca como ocupada se ainda não estiver, e atualiza o armazenamento
+                if (!tableOrders[activeTableId].occupied) {
+                    tableOrders[activeTableId].occupied = true;
+                    // Adiciona a classe 'occupied' ao elemento da mesa
+                    if (currentTableElement) {
+                        currentTableElement.classList.add('occupied');
+                    }
+                    localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                }
+
+                renderCurrentOrder();
+                // Limpa e esconde os resultados da busca de produtos ao selecionar uma nova mesa
+                orderProductSearchInput.value = '';
+                orderProductResultsList.classList.add('hidden');
+
+                resetPaymentInputs(); // Reseta os campos de pagamento ao selecionar uma nova mesa
+            }
+
+            /**
+             * Abre o modal de edição do nome da mesa.
+             * @param {string} tableId - O ID da mesa cujo nome será editado.
+             */
+            function openEditTableNameModal(tableId) {
+                editTableIdInput.value = tableId;
+                newTableNameInput.value = customTableNames[tableId] || document.getElementById(tableId).querySelector('span').textContent;
+                editTableNameModal.style.display = 'flex';
+            }
+
+            // Lida com o envio do formulário de edição de nome da mesa
+            editTableNameForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const tableId = editTableIdInput.value;
+                const newName = newTableNameInput.value.trim();
+
+                if (newName) {
+                    customTableNames[tableId] = newName;
+                    localStorage.setItem('comandaCustomTableNames', JSON.stringify(customTableNames));
+                    renderTables(); // Re-renderiza todas as mesas para refletir o novo nome
+                    // Se o nome da mesa atualmente ativa foi alterado, atualiza sua exibição
+                    if (activeTableId === tableId) {
+                        currentTableNumberSpan.textContent = newName;
+                    }
+                    editTableNameModal.style.display = 'none';
+                    showMessage(`Nome da ${newName} atualizado!`);
+                } else {
+                    showMessage('Por favor, digite um novo nome para a mesa.');
+                }
+            });
+
+            // Event listener para o botão "Adicionar Mesa"
+            addNewTableBtn.addEventListener('click', () => {
+                totalTablesCount++; // Incrementa a contagem total de mesas
+                const newTableId = `table-${totalTablesCount}`;
+
+                // Inicializa os dados para a nova mesa
+                customTableNames[newTableId] = `Mesa ${totalTablesCount}`;
+                tableOrders[newTableId] = { items: [], occupied: false };
+
+                // Salva a nova contagem e os novos dados no localStorage
+                localStorage.setItem('totalTablesCount', totalTablesCount.toString());
+                localStorage.setItem('comandaCustomTableNames', JSON.stringify(customTableNames));
+                localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+
+                renderTables(); // Re-renderiza todas as mesas para incluir a nova
+                showMessage(`Mesa ${totalTablesCount} adicionada!`);
+            });
+
+
+            /**
+             * Renderiza os itens e o total da comanda da mesa atualmente ativa.
+             */
+            function renderCurrentOrder() {
+                orderItemsList.innerHTML = ''; // Limpa os itens anteriores
+                let total = 0;
+
+                if (activeTableId && tableOrders[activeTableId] && tableOrders[activeTableId].items.length > 0) {
+                    emptyOrderMessage.style.display = 'none'; // Esconde a mensagem de vazio
+                    tableOrders[activeTableId].items.forEach((item, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'order-item p-3 mb-2 sm:p-4 sm:mb-3 text-sm sm:text-base';
+                        li.innerHTML = `
+                            <span class="font-medium">${item.name} (x${item.quantity})</span>
+                            <span class="font-bold text-gray-800">R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                            <div class="flex space-x-2">
+                                <!-- Botão de incremento (+) com cores fixas e realce -->
+                                <button data-index="${index}" class="increment-item-btn bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-md transition duration-200">+</button>
+                                <!-- Botão de decremento (-) com cores fixas e realce -->
+                                <button data-index="${index}" class="decrement-item-btn bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-md shadow-md transition duration-200">-</button>
+                                <button data-index="${index}" class="remove-item-btn bg-red-500 hover:bg-red-700 px-3 py-1.5 sm:px-4 sm:py-2">Remover</button>
+                            </div>
+                        `;
+                        orderItemsList.appendChild(li);
+                        total += item.price * item.quantity;
+                    });
+                } else {
+                    emptyOrderMessage.style.display = 'block'; // Mostra a mensagem de vazio
+                }
+
+                orderTotalSpan.textContent = total.toFixed(2);
+                updatePaymentSummary(); // Atualiza o resumo de pagamento ao renderizar a comanda
+
+                // Adiciona listeners de evento para os botões de item da comanda
+                document.querySelectorAll('.increment-item-btn').forEach(button => {
+                    button.addEventListener('click', (e) => updateOrderItemQuantity(e.target.dataset.index, 1));
+                });
+                document.querySelectorAll('.decrement-item-btn').forEach(button => {
+                    button.addEventListener('click', (e) => updateOrderItemQuantity(e.target.dataset.index, -1));
+                });
+                document.querySelectorAll('.remove-item-btn').forEach(button => {
+                    button.addEventListener('click', (e) => removeOrderItem(e.target.dataset.index));
+                });
+            }
+
+            /**
+             * Adiciona um produto à comanda da mesa atualmente ativa.
+             * @param {Object} product - O objeto produto a ser adicionado.
+             */
+            function addProductToCurrentOrder(product) {
+                if (!activeTableId) {
+                    showMessage('Por favor, selecione uma mesa primeiro.');
+                    return;
+                }
+                const order = tableOrders[activeTableId];
+                // Normaliza o nome do produto para a comparação
+                const existingItem = order.items.find(item => item.id === product.id);
+
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    // Garante que o nome do produto adicionado à comanda também seja normalizado
+                    order.items.push({ ...product, name: product.name.normalize('NFC'), quantity: 1 });
+                }
+                localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                renderCurrentOrder();
+                showMessage(`${product.name} adicionado à comanda.`);
+
+                orderProductSearchInput.value = ''; // Limpa o input de busca após adicionar
+                orderProductResultsList.classList.add('hidden'); // Esconde a lista de resultados
+            }
+
+            /**
+             * Atualiza a quantidade de um item na comanda atual.
+             * @param {number} index - O índice do item na lista de itens da comanda.
+             * @param {number} change - A mudança na quantidade (ex: 1 para incrementar, -1 para decrementar).
+             */
+            function updateOrderItemQuantity(index, change) {
+                const order = tableOrders[activeTableId];
+                if (order && order.items[index]) {
+                    order.items[index].quantity += change;
+                    if (order.items[index].quantity <= 0) {
+                        order.items.splice(index, 1); // Remove se a quantidade for zero ou menos
+                    }
+                    localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+                    renderCurrentOrder();
+                }
+            }
+
+            // --- Lógica de Pagamento ---
+
+            /**
+             * Renderiza os métodos de pagamento ativos na UI.
+             */
+            function renderActivePaymentMethods() {
+                activePaymentMethodsList.innerHTML = ''; // Limpa a lista
+                let hasActiveMethods = false;
+
+                for (const methodKey in activePayments) {
+                    if (currentActivePaymentMethods[methodKey] !== undefined) { // Se o método está ativo para a comanda atual (verificando se a chave existe)
+                        hasActiveMethods = true;
+                        const method = activePayments[methodKey];
+                        const div = document.createElement('div');
+                        div.className = 'active-payment-method-item';
+                        div.innerHTML = `
+                            <div class="flex items-center space-x-2">
+                                ${method.icon}
+                                <span class="font-medium">${method.name}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="number" data-method="${methodKey}" step="0.01" value="${currentActivePaymentMethods[methodKey].toFixed(2)}"
+                                    class="payment-amount-input shadow appearance-none border rounded-lg py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm sm:text-base w-24"
+                                    data-user-edited="false">
+                                <button class="remove-payment-method-btn" data-method="${methodKey}">X</button>
+                            </div>
+                        `;
+                        activePaymentMethodsList.appendChild(div);
+                    }
+                }
+
+                if (hasActiveMethods) {
+                    noPaymentMethodsAddedMessage.style.display = 'none';
+                } else {
+                    noPaymentMethodsAddedMessage.style.display = 'block';
+                }
+
+                // Adiciona listeners para os inputs de valor e botões de remoção
+                document.querySelectorAll('.payment-amount-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        const methodKey = e.target.dataset.method;
+                        currentActivePaymentMethods[methodKey] = parseFloat(e.target.value) || 0;
+                        e.target.dataset.userEdited = 'true'; // Marca como editado pelo usuário
+                        updatePaymentSummary();
+                    });
+                });
+
+                document.querySelectorAll('.remove-payment-method-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const methodKey = e.target.dataset.method;
+                        delete currentActivePaymentMethods[methodKey];
+                        renderActivePaymentMethods(); // Re-renderiza para remover o item
+                        updatePaymentSummary(); // Atualiza o resumo
+                    });
+                });
+
+                updatePaymentSummary(); // Garante que o resumo seja atualizado após renderizar
+            }
+
+            /**
+             * Adiciona um método de pagamento à lista de métodos ativos para a comanda atual.
+             * @param {string} methodKey - A chave do método de pagamento (ex: 'cash', 'pix').
+             */
+            function addPaymentMethod(methodKey) {
+                if (currentActivePaymentMethods[methodKey] === undefined) { // Verifica se o método ainda não foi adicionado
+                    currentActivePaymentMethods[methodKey] = 0; // Inicializa com 0
+                    renderActivePaymentMethods(); // Adiciona o método à UI
+                    // A chamada a updatePaymentSummary dentro de renderActivePaymentMethods cuidará do preenchimento
+                } else {
+                    showMessage(`${activePayments[methodKey].name} já foi adicionado.`);
+                }
+            }
+
+            // Event listeners para os ícones de adicionar método
+            document.getElementById('add-cash-btn').addEventListener('click', () => addPaymentMethod('cash'));
+            document.getElementById('add-pix-btn').addEventListener('click', () => addPaymentMethod('pix'));
+            document.getElementById('add-credit-btn').addEventListener('click', () => addPaymentMethod('credit'));
+            document.getElementById('add-debit-btn').addEventListener('click', () => addPaymentMethod('debit'));
+
+
+            /**
+             * Atualiza o resumo de pagamento (total pago e troco) na UI.
+             */
+            function updatePaymentSummary() {
+                const totalComanda = parseFloat(orderTotalSpan.textContent);
+                let totalPaid = 0;
+
+                // Soma os valores dos métodos de pagamento ativos
+                for (const methodKey in currentActivePaymentMethods) {
+                    totalPaid += parseFloat(currentActivePaymentMethods[methodKey]) || 0;
+                }
+
+                const change = totalPaid - totalComanda;
+                let remainingToPay = totalComanda - totalPaid;
+
+                totalPaidDisplay.textContent = totalPaid.toFixed(2);
+                changeDisplay.textContent = change.toFixed(2);
+
+                // Lógica para preencher automaticamente o próximo campo vazio se houver déficit
+                if (remainingToPay > 0) {
+                    // Encontra o primeiro input de método de pagamento que está ativo mas com valor 0
+                    const activeInputs = document.querySelectorAll('#active-payment-methods-list input[type="number"]');
+                    let filled = false;
+                    for (let i = 0; i < activeInputs.length; i++) {
+                        const input = activeInputs[i];
+                        const inputValue = parseFloat(input.value) || 0;
+
+                        // Só preenche se o valor for 0 OU vazio E o campo NÃO foi editado pelo usuário
+                        if ((inputValue === 0 || input.value === '') && !filled && input.dataset.userEdited !== 'true') {
+                            input.value = remainingToPay.toFixed(2);
+                            currentActivePaymentMethods[input.dataset.method] = parseFloat(input.value);
+                            filled = true;
+                            // Recalcula o total pago e o restante após o preenchimento
+                            totalPaid = 0;
+                            for (const methodKey in currentActivePaymentMethods) {
+                                totalPaid += parseFloat(currentActivePaymentMethods[methodKey]) || 0;
+                            }
+                            remainingToPay = totalComanda - totalPaid;
+                            totalPaidDisplay.textContent = totalPaid.toFixed(2);
+                            changeDisplay.textContent = (totalPaid - totalComanda).toFixed(2);
+                            break; // Importante: sai do loop após preencher o primeiro campo
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Reseta todos os campos e valores relacionados aos métodos de pagamento.
+             */
+            function resetPaymentInputs() {
+                currentActivePaymentMethods = {}; // Limpa todos os métodos ativos
+                renderActivePaymentMethods(); // Re-renderiza a lista para ficar vazia (e redefine data-user-edited para false)
+                updatePaymentSummary(); // Reseta os displays de total pago e troco
+            }
+
+
+            // Fecha a comanda atual e adiciona ao relatório de vendas
+            closeOrderButton.addEventListener('click', () => {
+                if (!activeTableId) {
+                    showMessage('Nenhuma mesa selecionada para fechar a comanda.');
+                    return;
+                }
+
+                const order = tableOrders[activeTableId];
+                const totalComanda = parseFloat(orderTotalSpan.textContent);
+                const currentTotalPaid = parseFloat(totalPaidDisplay.textContent);
+
+                // Validação: Pelo menos um método de pagamento deve estar ativo se houver itens
+                const anyPaymentMethodActive = Object.keys(currentActivePaymentMethods).length > 0;
+
+                if (order.items.length === 0 && currentTotalPaid === 0 && !anyPaymentMethodActive) {
+                    // Se a comanda está vazia e nada foi pago/selecionado, apenas libera a mesa
+                    showMessage('Mesa vazia liberada.');
+                } else if (currentTotalPaid < totalComanda) {
+                    showMessage('O valor total pago é menor que o total da comanda.');
+                    return;
+                } else if (currentTotalPaid === 0 && order.items.length > 0) {
+                    showMessage('Por favor, adicione e insira o valor pago para fechar a comanda.');
+                    return;
+                } else if (order.items.length > 0 && !anyPaymentMethodActive) {
+                    showMessage('Por favor, adicione e insira um valor para pelo menos um método de pagamento.');
+                    return;
+                }
+
+
+                const paymentDetails = [];
+                for (const methodKey in currentActivePaymentMethods) {
+                    const amount = parseFloat(currentActivePaymentMethods[methodKey]);
+                    if (amount > 0) {
+                        paymentDetails.push({ method: methodKey, amount: amount });
+                    }
+                }
+
+                // Se houver itens na comanda, registra a venda
+                if (order.items.length > 0) {
+                    let salesReport = JSON.parse(localStorage.getItem('comandaSalesReport')) || [];
+                    salesReport.push({
+                        id: Date.now().toString(),
+                        tableId: activeTableId,
+                        items: order.items,
+                        total: totalComanda,
+                        date: new Date().toLocaleString(),
+                        paymentDetails: paymentDetails, // Armazena todos os detalhes de pagamento
+                        totalPaid: currentTotalPaid,
+                        change: parseFloat(changeDisplay.textContent)
+                    });
+                    localStorage.setItem('comandaSalesReport', JSON.stringify(salesReport));
+                    showMessage('Comanda fechada e venda registrada com sucesso!');
+                }
+
+
+                // Limpa a comanda da mesa e marca como livre
+                delete tableOrders[activeTableId];
+                localStorage.setItem('comandaTableOrders', JSON.stringify(tableOrders));
+
+                const tableElement = document.getElementById(activeTableId);
+                if (tableElement) {
+                    tableElement.classList.remove('occupied');
+                    tableElement.classList.remove('active');
+                }
+
+                activeTableId = null; // Desseleciona a mesa
+                currentTableNumberSpan.textContent = 'Nenhuma';
+                renderCurrentOrder(); // Limpa a exibição da comanda
+                resetPaymentInputs(); // Reseta os campos de pagamento
+                renderSalesReport(); // Atualiza o relatório de vendas
+                renderTables(); // Re-renderiza as mesas
+            });
+
+            // --- Nova Lógica de Busca de Produtos para Comanda ---
+            orderProductSearchInput.addEventListener('focus', () => {
+                // Ao focar, se o input estiver vazio, mostra todos os produtos
+                if (products.length > 0 && orderProductSearchInput.value.trim() === '') {
+                    displayOrderProducts(products);
+                }
+            });
+
+            orderProductSearchInput.addEventListener('input', () => {
+                const searchTerm = orderProductSearchInput.value.toLowerCase().normalize('NFC'); // Normaliza o termo de busca
+                orderProductResultsList.innerHTML = ''; // Limpa os resultados anteriores
+
+                if (searchTerm.length > 0) {
+                    // Modificação aqui: Usar includes() para busca dinâmica
+                    const filteredProducts = products.filter(product =>
+                        product.name.toLowerCase().normalize('NFC').includes(searchTerm) // Normaliza o nome do produto para comparação
+                    );
+                    displayOrderProducts(filteredProducts);
+                } else {
+                    // Se o campo de busca estiver vazio, exibe todos os produtos novamente
+                    displayOrderProducts(products);
+                }
+            });
+
+            /**
+             * Exibe a lista de produtos para seleção na comanda.
+             * @param {Array<Object>} productsToDisplay - Array de produtos a serem exibidos.
+             */
+            function displayOrderProducts(productsToDisplay) {
+                orderProductResultsList.innerHTML = '';
+                if (productsToDisplay.length > 0) {
+                    productsToDisplay.forEach(product => {
+                        const li = document.createElement('li');
+                        li.className = 'order-product-result-item text-sm sm:text-base';
+                        li.innerHTML = `
+                            <span>${product.name}</span>
+                            <span class="font-bold text-gray-700 mr-2">R$ ${product.price.toFixed(2)}</span>
+                            <button class="add-product-list-btn" data-product-id="${product.id}">Adicionar</button>
+                        `;
+                        orderProductResultsList.appendChild(li);
+                    });
+                    orderProductResultsList.classList.remove('hidden'); // Mostra os resultados
+
+                    // Adiciona listeners de evento para os novos botões "Adicionar"
+                    document.querySelectorAll('.add-product-list-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Previne problemas se o item em si fosse clicável
+                            const productId = e.target.dataset.productId;
+                            const productToAdd = products.find(p => p.id === productId);
+                            if (productToAdd) {
+                                addProductToCurrentOrder(productToAdd);
+                            }
+                        });
+                    });
+
+                } else {
+                    orderProductResultsList.classList.add('hidden'); // Esconde se não houver resultados
+                }
+            }
+
+
+            // Esconde os resultados ao clicar fora da área de busca
+            document.addEventListener('click', (event) => {
+                if (!orderProductSearchInput.contains(event.target) && !orderProductResultsList.contains(event.target)) {
+                    orderProductResultsList.classList.add('hidden');
+                }
+            });
+
+            // --- Lógica de Importação de CSV ---
+            importCsvBtn.addEventListener('click', () => {
+                const file = csvFileInput.files[0];
+                if (!file) {
+                    showMessage('Por favor, selecione um arquivo CSV para importar.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                const encoding = csvEncodingSelect.value; // Obtém a codificação selecionada
+
+                reader.onload = (e) => {
+                    const csvText = e.target.result;
+                    console.log('Raw CSV Text:', csvText); // Log o texto completo do arquivo
+                    // Usa uma regex para lidar com diferentes tipos de quebra de linha (\r\n, \n, \r)
+                    const lines = csvText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
+                    let importedCount = 0;
+                    let failedLines = []; // Para registrar linhas que falharam na importação
+
+                    lines.forEach((line, index) => {
+                        try {
+                            console.log(`Processing line ${index + 1}:`, line); // Log cada linha
+                            const parts = line.split(',');
+                            console.log(`Parsed parts for line ${index + 1}:`, parts); // Log as partes separadas por vírgula
+
+                            if (parts.length === 2) {
+                                let name = parts[0].trim();
+                                // Normaliza o nome logo após a leitura e antes de qualquer comparação ou armazenamento
+                                name = name.normalize('NFC');
+                                // Substitui vírgula por ponto para garantir que parseFloat funcione corretamente
+                                const price = parseFloat(parts[1].trim().replace(',', '.'));
+
+                                if (name && !isNaN(price) && price > 0) {
+                                    // Verifica se o produto já existe pelo nome (case-insensitive e normalizado)
+                                    const existingProduct = products.find(p => p.name.toLowerCase() === name.toLowerCase());
+                                    if (!existingProduct) {
+                                        const newProduct = {
+                                            id: Date.now().toString() + '-' + index + '-' + Math.random().toString(36).substr(2, 9), // ID único mais robusto
+                                            name: name, // O nome já está normalizado
+                                            price: price
+                                        };
+                                        products.push(newProduct);
+                                        importedCount++;
+                                    } else {
+                                        console.warn(`Produto "${name}" já existe e será ignorado na importação.`);
+                                    }
+                                } else {
+                                    failedLines.push(`Linha ${index + 1}: Dados inválidos (Nome: "${name}", Preço: "${parts[1].trim()}")`);
+                                }
+                            } else {
+                                failedLines.push(`Linha ${index + 1}: Formato incorreto (esperado "Nome,Preço", encontrado "${line}")`);
+                            }
+                        } catch (error) {
+                            failedLines.push(`Linha ${index + 1}: Erro de processamento - ${error.message}`);
+                            console.error(`Erro ao processar linha ${index + 1}: ${line}`, error);
+                        }
+                    });
+
+                    localStorage.setItem('comandaProducts', JSON.stringify(products));
+                    renderProducts(); // Re-renderiza a lista de produtos
+                    csvFileInput.value = ''; // Limpa o input do arquivo
+
+                    let finalMessage = '';
+                    if (importedCount > 0) {
+                        finalMessage += `${importedCount} produtos importados com sucesso do CSV!`;
+                    } else {
+                        finalMessage += 'Nenhum novo produto válido foi encontrado para importar do CSV.';
+                    }
+
+                    if (failedLines.length > 0) {
+                        finalMessage += `\n\nProblemas nas seguintes linhas:\n${failedLines.join('\n')}`;
+                    }
+                    showMessage(finalMessage);
+                };
+
+                reader.onerror = () => {
+                    showMessage('Erro ao ler o arquivo CSV. Verifique a codificação e o formato.');
+                };
+
+                // Usa a codificação selecionada para ler o arquivo
+                reader.readAsText(file, encoding);
+            });
+
+
+            // --- Relatório de Vendas ---
+            const salesReportContent = document.getElementById('sales-report-content');
+
+            /**
+             * Função auxiliar para obter o nome amigável do método de pagamento.
+             * @param {string} method - A chave do método de pagamento.
+             * @returns {string} O nome de exibição do método de pagamento.
+             */
+            function getPaymentMethodDisplayName(method) {
+                switch (method) {
+                    case 'cash': return 'Dinheiro';
+                    case 'pix': return 'Pix';
+                    case 'credit': return 'Crédito';
+                    case 'debit': return 'Débito';
+                    default: return 'Desconhecido';
+                }
+            }
+
+            /**
+             * Renderiza o relatório de vendas na seção de relatório.
+             */
+            function renderSalesReport() {
+                let salesReport = JSON.parse(localStorage.getItem('comandaSalesReport')) || [];
+                salesReportContent.innerHTML = ''; // Limpa o conteúdo anterior
+
+                if (salesReport.length === 0) {
+                    salesReportContent.innerHTML = '<p class="text-gray-500 italic">Nenhuma venda registrada ainda.</p>';
+                    return;
+                }
+
+                let grandTotal = 0;
+                let reportHtml = '<h3 class="text-xl sm:text-2xl font-semibold mb-4">Histórico de Vendas:</h3>';
+
+                salesReport.forEach(sale => {
+                    reportHtml += `
+                        <div class="sale-entry mb-4 p-3 sm:p-4 border rounded-lg shadow-sm bg-gray-50">
+                            <h4 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Venda na ${customTableNames[sale.tableId] || sale.tableId.replace('table-', 'Mesa ')} <span class="text-sm sm:text-base text-gray-600 font-normal">(${sale.date})</span></h4>
+                            <ul class="list-disc pl-5 mb-2 text-gray-700 text-sm sm:text-base">
+                    `;
+                    sale.items.forEach(item => {
+                        reportHtml += `<li>${item.name} (x${item.quantity}) - R$ ${(item.price * item.quantity).toFixed(2)}</li>`;
+                    });
+                    reportHtml += `
+                            </ul>
+                            <p class="text-base sm:text-lg font-bold text-right text-green-700">Total da Venda: R$ ${sale.total.toFixed(2)}</p>
+                            <p class="text-base sm:text-lg font-bold text-gray-800 mt-2">Pagamentos:</p>
+                            <ul class="list-disc pl-5 text-gray-700 text-sm sm:text-base">
+                    `;
+                    if (sale.paymentDetails && sale.paymentDetails.length > 0) {
+                        sale.paymentDetails.forEach(detail => {
+                            reportHtml += `<li>${getPaymentMethodDisplayName(detail.method)}: R$ ${detail.amount.toFixed(2)}</li>`;
+                        });
+                    } else {
+                        reportHtml += `<li>Nenhum detalhe de pagamento registrado.</li>`;
+                    }
+                    reportHtml += `
+                            </ul>
+                            <p class="text-base sm:text-lg font-bold text-gray-800 mt-2">Total Pago: R$ ${sale.totalPaid.toFixed(2)}</p>
+                    `;
+                    // Condição para exibir o troco: apenas se houver troco positivo E a venda foi exclusivamente em dinheiro
+                    const isCashOnly = sale.paymentDetails.length === 1 && sale.paymentDetails[0].method === 'cash';
+                    if (sale.change > 0 && isCashOnly) {
+                        reportHtml += `<p class="text-base sm:text-lg font-bold text-gray-800">Troco: R$ ${sale.change.toFixed(2)}</p>`;
+                    }
+                    reportHtml += `</div>`;
+                    grandTotal += sale.total;
+                });
+
+                reportHtml += `<h3 class="text-xl sm:text-2xl font-bold mt-6 text-right text-blue-800">Total Geral de Vendas: R$ ${grandTotal.toFixed(2)}</h3>`;
+                salesReportContent.innerHTML = reportHtml;
+            }
+
+            // --- Lógica de Tema (Claro/Escuro) ---
+            /**
+             * Aplica o tema claro ou escuro ao corpo do documento.
+             * @param {boolean} isDarkMode - `true` para aplicar o modo escuro, `false` para o modo claro.
+             */
+            function applyTheme(isDarkMode) {
+                if (isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    themeToggleBtn.textContent = '🌙'; // Ícone de lua para modo escuro
+                    themeToggleBtn.setAttribute('aria-label', 'Alternar para modo claro');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    themeToggleBtn.textContent = '☀️'; // Ícone de sol para modo claro
+                    themeToggleBtn.setAttribute('aria-label', 'Alternar para modo escuro');
+                }
+            }
+
+            // Carregar o tema salvo ou usar o padrão do sistema
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark') {
+                applyTheme(true);
+            } else if (savedTheme === 'light') {
+                applyTheme(false);
+            } else {
+                applyTheme(prefersDarkMode);
+            }
+
+            // Alternar tema ao clicar no botão
+            themeToggleBtn.addEventListener('click', () => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                applyTheme(!isDarkMode);
+                localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
+            });
+        });
+    </script>
+</body>
+</html>
